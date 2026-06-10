@@ -1,5 +1,6 @@
 using System;
 
+using Dalamud.Game.Command;
 using Dalamud.Interface.Windowing;
 using Dalamud.IoC;
 using Dalamud.Plugin;
@@ -61,10 +62,22 @@ public sealed class Plugin : IDalamudPlugin
 
         PluginInterface.UiBuilder.Draw += DrawUI;
         PluginInterface.UiBuilder.OpenConfigUi += OpenConfigUI;
+
+        CommandManager.AddHandler("/xrc", new CommandInfo(OnCommand)
+        {
+            HelpMessage = "Open the XIV Remote Chat configuration window.",
+        });
+        CommandManager.AddHandler("/xivremotechat", new CommandInfo(OnCommand)
+        {
+            HelpMessage = "Open the XIV Remote Chat configuration window.",
+        });
     }
 
     public void Dispose()
     {
+        CommandManager.RemoveHandler("/xrc");
+        CommandManager.RemoveHandler("/xivremotechat");
+
         PluginInterface.UiBuilder.Draw -= DrawUI;
         PluginInterface.UiBuilder.OpenConfigUi -= OpenConfigUI;
 
@@ -75,6 +88,8 @@ public sealed class Plugin : IDalamudPlugin
         TokenRenewalService.Dispose();
         FriendListRefreshService.Dispose();
     }
+
+    private void OnCommand(string command, string args) => configWindow.Toggle();
 
     private void DrawUI() => windowSystem.Draw();
     private void OpenConfigUI() => configWindow.Toggle();
