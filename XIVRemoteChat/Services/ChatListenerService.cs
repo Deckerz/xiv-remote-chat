@@ -140,6 +140,7 @@ public sealed class ChatListenerService : WebsocketServiceBase
         {
             while (pending.Count > MaxPendingMessages && pending.TryDequeue(out _)) { }
             Plugin.Log.Warning("[ChatListener] WebSocket not connected — holding messages until reconnect.");
+            Connect();
             return;
         }
 
