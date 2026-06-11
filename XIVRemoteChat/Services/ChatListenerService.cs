@@ -88,6 +88,11 @@ public sealed class ChatListenerService : WebsocketServiceBase
 
         var localPlayer = Plugin.PlayerState;
         var senderName = GetSenderWithWorld(message.Sender);
+        if(string.IsNullOrEmpty(senderName))
+        {
+            senderName = "System";
+        }
+
         var isSelf = message.LogKind == XivChatType.TellOutgoing
                      || (!string.IsNullOrEmpty(localPlayer.CharacterName)
                          && senderName.Contains(localPlayer.CharacterName, StringComparison.Ordinal));
