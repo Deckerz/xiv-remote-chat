@@ -19,7 +19,8 @@ public class Configuration : IPluginConfiguration
 
     public Dictionary<XivChatType, bool> EnabledChannels { get; set; } = new()
     {
-
+        [XivChatType.Debug] = true,
+        [XivChatType.Urgent] = false,
         [XivChatType.Say] = false,
         [XivChatType.Shout] = false,
         [XivChatType.Yell] = false,

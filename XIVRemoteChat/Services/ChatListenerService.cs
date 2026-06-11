@@ -210,6 +210,9 @@ public sealed class ChatListenerService : WebsocketServiceBase
         XivChatType.TellOutgoing => $"DM: {senderName}",
         XivChatType.CustomEmote => "Emote",
         XivChatType.StandardEmote => "Emote",
+        XivChatType.Debug => "System",
+        XivChatType.Urgent => "System",
+        XivChatType.Echo => "System",
         _ => type.ToString(),
     };
 
