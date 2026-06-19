@@ -136,14 +136,10 @@ public static class Helpers
         byte[] saltBytes = Encoding.UTF8.GetBytes(salt);
         byte[] iv = RandomNumberGenerator.GetBytes(16);
 
-        byte[] key = new byte[32];
-        Rfc2898DeriveBytes.Pbkdf2(
-            password: Encoding.UTF8.GetBytes(password),
-            salt: saltBytes,
-            iterations: 100_000,
-            hashAlgorithm: HashAlgorithmName.SHA256,
-            destination: key
-        );
+#pragma warning disable SYSLIB0041 // static Pbkdf2 uses Windows CNG which fails under Wine
+        using var deriveBytes = new Rfc2898DeriveBytes(password, saltBytes, 100_000, HashAlgorithmName.SHA256);
+#pragma warning restore SYSLIB0041
+        byte[] key = deriveBytes.GetBytes(32);
 
         using var aes = Aes.Create();
         aes.Key = key;

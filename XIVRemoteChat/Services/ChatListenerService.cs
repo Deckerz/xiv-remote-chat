@@ -86,23 +86,29 @@ public sealed class ChatListenerService : WebsocketServiceBase
             return;
         }
 
-        var localPlayer = Plugin.PlayerState;
+        var logKind = message.LogKind;
         var senderName = GetSenderWithWorld(message.Sender);
-        if(string.IsNullOrEmpty(senderName))
+        var messageText = Helpers.ConvertSeString(message.Message);
+        var characterName = Plugin.PlayerState.CharacterName;
+
+        _ = Task.Run(() => ProcessChatMessage(logKind, senderName, messageText, characterName));
+    }
+
+    private void ProcessChatMessage(XivChatType logKind, string senderName, string messageText, string characterName)
+    {
+        if (string.IsNullOrEmpty(senderName))
         {
             senderName = "System";
         }
 
-        var isSelf = message.LogKind == XivChatType.TellOutgoing
-                     || (!string.IsNullOrEmpty(localPlayer.CharacterName)
-                         && senderName.Contains(localPlayer.CharacterName, StringComparison.Ordinal));
+        var isSelf = logKind == XivChatType.TellOutgoing
+                     || (!string.IsNullOrEmpty(characterName)
+                         && senderName.Contains(characterName, StringComparison.Ordinal));
 
-        var messageText = Helpers.ConvertSeString(message.Message);
-
-        var trueSenderName = isSelf ? Plugin.PlayerState.CharacterName : senderName;
+        var trueSenderName = isSelf ? characterName : senderName;
 
         pending.Enqueue(new SocketChatMessageDto(
-            Channel: GetChannelName(message.LogKind, senderName),
+            Channel: GetChannelName(logKind, senderName),
             SenderName: configuration.HasEncryptionSettings ? Helpers.Encrypt(trueSenderName, configuration.EncryptionPassword!, configuration.EncryptionSalt!) : trueSenderName,
             Message: configuration.HasEncryptionSettings ? Helpers.Encrypt(messageText, configuration.EncryptionPassword!, configuration.EncryptionSalt!) : messageText,
             Self: isSelf,
@@ -141,6 +147,8 @@ public sealed class ChatListenerService : WebsocketServiceBase
             return;
         }
 
+        Plugin.Log.Debug($"[ChatListener] Flushing {pending.Count} message(s) to server.");
+
         if (!IsConnected)
         {
             while (pending.Count > MaxPendingMessages && pending.TryDequeue(out _)) { }
@@ -176,6 +184,7 @@ public sealed class ChatListenerService : WebsocketServiceBase
             if (batch.Count > 0)
             {
                 await SendBatchAsync(JsonSerializer.Serialize(batch));
+                Plugin.Log.Debug($"[ChatListener] Sent {batch.Count} message(s) to server.");
             }
         }
         catch (Exception ex)

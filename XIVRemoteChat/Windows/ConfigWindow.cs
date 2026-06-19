@@ -195,6 +195,8 @@ public sealed class ConfigWindow : Window, IDisposable
                 configuration.Token = null;
                 configuration.Save();
                 plugin.TokenRenewalService.ScheduleRenewal();
+                plugin.ChatListenerService.DisconnectAsync().ContinueWith(_ => plugin.SendListenerService.DisconnectAsync());
+                SetPasteStatus("Logged out successfully.", isError: false);
                 statusMessage = string.Empty;
             }
         }
