@@ -16,7 +16,7 @@ public sealed class FriendListRefreshService : IDisposable
 {
     private static readonly TimeSpan RefreshInterval = TimeSpan.FromMinutes(15);
     private static readonly TimeSpan InitialDelay = TimeSpan.FromSeconds(15);
-    private static readonly TimeSpan PostDelay = TimeSpan.FromSeconds(2);
+    private static readonly TimeSpan PostDelay = TimeSpan.FromSeconds(3);
 
     private readonly Configuration configuration;
 
@@ -61,7 +61,9 @@ public sealed class FriendListRefreshService : IDisposable
             try
             {
                 Helpers.RefreshPlayerFreindsList();
-                nextPost = now + PostDelay;
+                TimeSpan timeSpan = configuration.IHaveALargeFriendsList ? TimeSpan.FromSeconds(15) : PostDelay;
+                Plugin.Log.Debug($"[FriendListRefresh] Next post scheduled in {timeSpan.TotalSeconds} seconds.");
+                nextPost = DateTime.UtcNow + timeSpan;
             }
             catch (Exception ex)
             {

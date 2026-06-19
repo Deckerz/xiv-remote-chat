@@ -6,7 +6,7 @@
     <Author>Chika</Author>
     <Description>Allows you to control any instance of FF connected to chat or send commands.</Description>
     <Punchline>Remote control of your chat.</Punchline>
-    <Version>0.0.0.5</Version>
+    <Version>0.0.0.11</Version>
     <RepoUrl>https://github.com/Deckerz/xiv-remote-chat</RepoUrl>
     <Tags>chat;remote;commands</Tags>
     <IsPackable>false</IsPackable>

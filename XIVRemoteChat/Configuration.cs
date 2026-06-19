@@ -15,6 +15,8 @@ public class Configuration : IPluginConfiguration
     public string? EncryptionPassword { get; set; } = null;
     public string? EncryptionSalt { get; set; } = null;
 
+	public bool IHaveALargeFriendsList { get; set; }
+
     public bool HasEncryptionSettings => !string.IsNullOrEmpty(EncryptionPassword) && !string.IsNullOrEmpty(EncryptionSalt);
 
     public Dictionary<XivChatType, bool> EnabledChannels { get; set; } = new()

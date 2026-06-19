@@ -1,6 +1,5 @@
 using System;
 using System.Collections.Generic;
-using System.Diagnostics;
 using System.Net.WebSockets;
 using System.Numerics;
 
@@ -161,13 +160,13 @@ public sealed class ConfigWindow : Window, IDisposable
             try
             {
                 authCallbackServer.Start();
+                Dalamud.Utility.Util.OpenLink(LoginUrl);
             }
             catch (Exception ex)
             {
                 SetPasteStatus($"Could not start login listener: {ex.Message}", isError: true);
+                Plugin.Log.Error(ex, "Could not start login listener");
             }
-
-            Process.Start(new ProcessStartInfo(LoginUrl) { UseShellExecute = true });
         }
 
         if (authCallbackServer.IsRunning)
@@ -178,6 +177,13 @@ public sealed class ConfigWindow : Window, IDisposable
 
         if (isLoggedIn)
         {
+            bool iHaveALargeFriendsList = configuration.IHaveALargeFriendsList;
+			if (ImGui.Checkbox("I have a large friends list (100+)", ref iHaveALargeFriendsList))
+			{
+				configuration.IHaveALargeFriendsList = iHaveALargeFriendsList;
+				configuration.Save();
+			}
+            
             ImGui.Spacing();
             if (ImGui.Button("Force Friends List Refresh"))
             {
@@ -276,6 +282,7 @@ public sealed class ConfigWindow : Window, IDisposable
         }
 
         SetPasteStatus("Token saved successfully.", isError: false);
+        authCallbackServer.Stop();
     }
 
     private void SetPasteStatus(string message, bool isError)
