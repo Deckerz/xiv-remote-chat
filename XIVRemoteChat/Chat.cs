@@ -1,5 +1,9 @@
+// Credit to: https://github.com/Infiziert90/ChatTwo/blob/main/ChatTwo/GameFunctions/ChatBox.cs
+
 using System;
 using System.Text;
+
+using Dalamud.Memory;
 
 using FFXIVClientStructs.FFXIV.Client.System.String;
 using FFXIVClientStructs.FFXIV.Client.UI;
@@ -8,7 +12,7 @@ public static unsafe class Chat
 {
     public static void SendMessageUnsafe(byte[] message)
     {
-        var mes = Utf8String.FromSequence(message);
+        var mes = Utf8String.FromSequence(message.NullTerminate());
         UIModule.Instance()->ProcessChatBoxEntry(mes);
         mes->Dtor(true);
     }
